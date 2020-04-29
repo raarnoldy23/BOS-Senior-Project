@@ -8,6 +8,12 @@
 // create roboclaw object
 RoboClaw roboclaw(&Serial1, 10000);
 
+
+int ReadEncoderDelay = 250; // Encoder read speed 
+int MotorSpeed  = 100 ; // speed of motor    
+
+
+
 void setup() {
   Serial.begin(9600); //SM
   Serial2.begin(9600); //BLE
@@ -16,64 +22,77 @@ void setup() {
 }
 
 void loop() {
-  bluetooth();
-
-
+  bool readEncoder = true; 
+  char input = bluetooth();
+  feedback();  
+  selection(input);  
+ 
 
 
 }
 
-void bluetooth() {
+
+/*Function checks if bluetooth is available then returns value sent by user*/
+char bluetooth() {
+  
   // Listen for radio
   if (Serial2.available()) {
     //  Serial.print("receiving");
     //Serial.write(Serial1.read());
     char in = Serial2.read(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
-    Serial2.print("|");
-    Serial.print(EncoderValue); // send encoder value to the tablet
-    Serial2.print("|");
-    Serial.print(in);
 
-    selection(in); // send read value to selection function
+    return in; 
   }
 }
+
+
+void feedback() {
+
+    long  EncoderValue = roboclaw.ReadEncM1(address);
+    //Serial2.print("|");  
+    Serial2.print(EncoderValue); // send encoder value to the tablet  
+    Serial.print(EncoderValue); 
+    Serial2.println("."); 
+    Serial2.print("|");  
+    delay(ReadEncoderDelay); 
+  
+  } 
 
 
 void selection(char sel) {
 
   if (sel == '1') {
     Forward();
-    Serial.print("Forward");
   }
   else if (sel == '2') {
     Reverse();
-    Serial.print("reverse");
   }
   else if (sel = '0') {
     Break();
   }
   else {
-    Serial.println("Enter a valid input");
+   
   }
 }
 
 
+/*Calls forward function*/
 void Forward() {
-  roboclaw.ForwardM1(address, 100);
-  Serial.print("Forward");
-  delay(500);
+  roboclaw.ForwardM1(address, MotorSpeed);
+
 }
 
 
+/*Calls Reverse function*/
 void Reverse() {
-  roboclaw.BackwardM1(address, 100);
-  Serial.print("Reverse");
-  delay(500);
+  roboclaw.BackwardM1(address, MotorSpeed);
+
 }
 
 
+/*Calls Break */ 
 void Break() {
   roboclaw.BackwardM1(address, 0);
-  Serial.print("Break");
+
 }

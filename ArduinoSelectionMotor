@@ -1,0 +1,12 @@
+ if (sel == '1') {
+    Forward();
+  }
+  else if (sel == '2') {
+    Reverse();
+  }
+  else if (sel = '0') {
+    Break();
+  }
+  else {
+   
+  }
