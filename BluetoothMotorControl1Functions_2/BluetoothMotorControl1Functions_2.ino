@@ -23,7 +23,7 @@ void setup() {
 
 void loop() {
   bool readEncoder = true; 
-  char input = bluetooth();
+  String input = bluetooth();
   feedback();  
   selection(input);  
  
@@ -33,15 +33,13 @@ void loop() {
 
 
 /*Function checks if bluetooth is available then returns value sent by user*/
-char bluetooth() {
-  
+String bluetooth() {
   // Listen for radio
   if (Serial2.available()) {
     //  Serial.print("receiving");
     //Serial.write(Serial1.read());
-    char in = Serial2.read(); // read value from user
+    String in = Serial2.read(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
-
     return in; 
   }
 }
@@ -60,20 +58,13 @@ void feedback() {
   } 
 
 
-void selection(char sel) {
+void selection(String sel) {
 
-  if (sel == '1') {
-    Forward();
-  }
-  else if (sel == '2') {
-    Reverse();
-  }
-  else if (sel = '0') {
-    Break();
-  }
-  else {
-   
-  }
+  if (sel
+
+
+
+  
 }
 
 
