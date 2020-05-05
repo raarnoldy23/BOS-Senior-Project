@@ -18,7 +18,6 @@ void setup() {
   Serial.begin(9600); //SM
   Serial2.begin(9600); //BLE
   roboclaw.begin(9600); //Start Roboclaw
-  Serial.println("....");
 }
 
 void loop() {
@@ -36,10 +35,11 @@ void loop() {
 String bluetooth() {
   // Listen for radio
   if (Serial2.available()) {
-    //  Serial.print("receiving");
-    //Serial.write(Serial1.read());
+    
     String in = Serial2.readString(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
+    //Serial.print("Reading:  "); 
+    Serial.println(in); // print value read in 
     return in; 
   }
 }
@@ -60,13 +60,14 @@ void feedback() {
 
 void selection(String sel) {
   int cycleCount; // Store the desired value for cycles from the user. 
-  if (sel.startsWith("cyc")) {
-    Serial.print("Enter");
+
+    //Serial.println("Whole Value: "); 
+    //Serial.println(sel); 
     String cyc_r = sel.substring(3,sel.length()); // slice string prefix
     cycleCount = cyc_r.toInt();   // convert string to integer value  
-    Serial.print("The Cycle value is"); 
-    Serial.println(cycleCount);
-    }
+    //Serial.print("The Cycle value is"); 
+    //Serial.println(cycleCount);
+    
 
 
 
