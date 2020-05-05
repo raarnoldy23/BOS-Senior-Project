@@ -38,7 +38,7 @@ String bluetooth() {
   if (Serial2.available()) {
     //  Serial.print("receiving");
     //Serial.write(Serial1.read());
-    String in = Serial2.read(); // read value from user
+    String in = Serial2.readString(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
     return in; 
   }
@@ -59,8 +59,14 @@ void feedback() {
 
 
 void selection(String sel) {
-
-  if (sel
+  int cycleCount; // Store the desired value for cycles from the user. 
+  if (sel.startsWith("cyc")) {
+    Serial.print("Enter");
+    String cyc_r = sel.substring(3,sel.length()); // slice string prefix
+    cycleCount = cyc_r.toInt();   // convert string to integer value  
+    Serial.print("The Cycle value is"); 
+    Serial.println(cycleCount);
+    }
 
 
 
