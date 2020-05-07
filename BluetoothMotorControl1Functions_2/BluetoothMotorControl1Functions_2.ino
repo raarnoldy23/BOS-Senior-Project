@@ -3,29 +3,52 @@
 
 #include "RoboClaw.h"
 
-#define address 0x80
+#define address 0x80 
 
 // create roboclaw object
 RoboClaw roboclaw(&Serial1, 10000);
 
-
-int ReadEncoderDelay = 250; // Encoder read speed 
-int MotorSpeed  = 100 ; // speed of motor    
-
+/*Settings*/
+int ReadEncoderDelay = 250; // Encoder read speed
+int MotorSpeed  = 100 ; // speed of motor
+/*Hall Vars */
+int hall1; // hall count
+int hall2;
+long EncoderValue; // current encoder value
+int openlimit;
+int closelimit = 0; 
+/*Testing Parameters*/
+int closedelay; // delay before starting next
+int opendelay;
+int cyclecount; // cycles to be run
+int currentcycle; // cycle counter
+/*LEDS*/
+#define PowerLED  13 // shared with programming port on the board 
+#define StatusLED 12
+#define ConnectedLED 11
+#define ErrorLED     10
 
 
 void setup() {
   Serial.begin(9600); //SM
   Serial2.begin(9600); //BLE
-  roboclaw.begin(9600); //Start Roboclaw
+  roboclaw.begin(9600); //Start Roboclaward
+#define StatusLED 12
+#define ConnectedLED 11
+
+  pinMode(PowerLED, OUTPUT);
+  pinMode(StatusLED, OUTPUT);
+  pinMode(ConnectedLED, OUTPUT);
+  pinMode(ErrorLED, OUTPUT);
 }
 
 void loop() {
-  bool readEncoder = true; 
+  digitalWrite(PowerLED, HIGH);
+  bool readEncoder = true;
   String input = bluetooth();
-  feedback();  
-  selection(input);  
- 
+  feedback();
+  selection(input);
+
 
 
 }
@@ -35,62 +58,149 @@ void loop() {
 String bluetooth() {
   // Listen for radio
   if (Serial2.available()) {
-    
+
     String in = Serial2.readString(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
-    //Serial.print("Reading:  "); 
-    Serial.println(in); // print value read in 
-    return in; 
+    //Serial.print("Reading:  ");
+    Serial.println(in); // print value read in
+    return in;
+  }
+}
+
+/*Read feedback from the motors*/
+void feedback() {
+
+  EncoderValue = roboclaw.ReadEncM1(address);
+  Serial2.print(EncoderValue); // send encoder value to the tablet
+  Serial.print(EncoderValue);
+  Serial2.println(".");
+  Serial2.print("|");
+  delay(ReadEncoderDelay);
+
+}
+
+/*Manages input recieved front the user*/
+void selection(String sel) {
+  if (sel.startsWith("cyc")) {
+    String cyc_r = sel.substring(3, sel.length()); // slice string prefix
+    cyclecount = cyc_r.toInt();   // convert string to integer value
+  }
+  /*Delay between Open and close cycle*/
+  else if (sel.startsWith("odl")) {
+    String opendelay_r = sel.substring(3, sel.length());
+    opendelay = opendelay_r.toInt();
+    opendelay = opendelay * 1000;
+  }
+  else if (sel.startsWith("cdl")) {
+    String closedelay_r = sel.substring(3, sel.length());
+    closedelay = closedelay_r.toInt();
+    closedelay = closedelay * 1000;
+  }
+  /*Set close Limit*/
+  else if (sel.startsWith("cll")) {
+    closelimit = EncoderValue ;
+  }
+  else if (sel.startsWith("rsl")) {
+    openlimit = 0;
+    closelimit = 0;
+
+  }
+  else if (sel.startsWith("rsh")) {
+    EncoderValue = 0;
+  }
+  
+  /*Set Open Limit */
+  else if (sel.startsWith("opl")) {
+    openlimit = EncoderValue ;
+
+  }
+  else if (sel.startsWith("fwd")) {
+    Forward();
+  }
+  else if (sel.startsWith("rev")) {
+    Reverse();
+  }
+  else if (sel.startsWith("brk")) {
+    Break();
+  }
+  else if (sel.startsWith("sta")) {
+    ResumeTest();
+  }
+  else if (sel.startsWith("rst")) {
+    ResetTest();
+  }
+  else if (sel.startsWith("pau")) {
+    PauseTest();
+  }
+}
+
+void ResumeTest() {
+  // Return home
+  if (EncoderValue != 0) {
+    ReturnHome();
+  }
+  // Test Cycle 
+  while(currentcycle <= cyclecount) {
+    // OPEN
+    if (EncoderValue< openlimit){
+      Forward();
+    }
+    // CLOSE 
+    else if (EncoderValue > openlimit){
+      Reverse(); 
+    }
+    currentcycle ++; 
   }
 }
 
 
-void feedback() {
-
-    long  EncoderValue = roboclaw.ReadEncM1(address);
-    //Serial2.print("|");  
-    Serial2.print(EncoderValue); // send encoder value to the tablet  
-    Serial.print(EncoderValue); 
-    Serial2.println("."); 
-    Serial2.print("|");  
-    delay(ReadEncoderDelay); 
-  
-  } 
-
-
-void selection(String sel) {
-  int cycleCount; // Store the desired value for cycles from the user. 
-
-    //Serial.println("Whole Value: "); 
-    //Serial.println(sel); 
-    String cyc_r = sel.substring(3,sel.length()); // slice string prefix
-    cycleCount = cyc_r.toInt();   // convert string to integer value  
-    //Serial.print("The Cycle value is"); 
-    //Serial.println(cycleCount);
-    
 
 
 
-  
+void ResetTest() {
+  Break();
+  ReturnHome(); 
+  currentcycle = 0; 
+  cyclecount = 0; 
 }
 
 
-/*Calls forward function*/
+void PauseTest() {
+  Break(); 
+  ReturnHome(); 
+}
+/* Return to home position */
+/* May need to change variables based on direction +- */
+/* Function may also need to add hardcode off set var to compensate for delays*/
+void ReturnHome() {
+
+  if (EncoderValue >= 0) {
+    while (EncoderValue >= 0) {
+      Forward(); // May need to change to reverse
+    }
+  }
+  else if (EncoderValue <= 0) {
+    while (EncoderValue <= 0) {
+      Reverse();
+    }
+  }
+}
+
+
 void Forward() {
   roboclaw.ForwardM1(address, MotorSpeed);
 
 }
 
 
-/*Calls Reverse function*/
 void Reverse() {
   roboclaw.BackwardM1(address, MotorSpeed);
 
 }
 
 
-/*Calls Break */ 
 void Break() {
   roboclaw.BackwardM1(address, 0);
-
+  roboclaw.BackwardM2(address, 0);
 }
+  
