@@ -1,6 +1,12 @@
 // Test the function of bluetooth module
 // Sending and returning data over bluetooth
-#define led 13
+// Implement Millis function
+
+/*Timing variables*/
+const unsigned long ReadBluetooth = 2500; // read bluetooth frequency 
+unsigned long lastbluetoothread = 0; // place holder 
+const unsigned long selection = 1000;  
+unsigned long lastselectionread = 0;    
 
 void setup() {
   Serial.begin(9600); //SM
@@ -10,9 +16,18 @@ void setup() {
 
 
 void loop() {
-  String  input = bluetooth();
+  unsigned long currentTime = millis(); // clock  
+  String input; //holds user input 
+  /*Timing functions*/
+  if (currentTime - lastbluetoothread >= ReadBluetooth)
+    input = bluetooth();
+    lastbluetoothread = currentTime; // reset last read clock 
+  }
+
+
+  input = bluetooth();
   selection(input);
-}
+} 
 
 
 // Function the initalizes bluetooth connection

@@ -1,3 +1,5 @@
+#include <RoboClaw.h>
+
 // Ryan Arnoldy
 // Bluetooth Motor control
 
@@ -17,11 +19,16 @@ int hall2;
 long EncoderValue; // current encoder value
 int openlimit;
 int closelimit = 0; 
+
 /*Event timing*/ 
 /*Event timeing interval*/
 const unsigned long Read_BluetoothInput = 250;  // 1
+unsigned long last1 = 0; 
 const unsigned long Read_Encoder = 100; // 2
-const unsigned long User_Selection = 250; // 3    
+unsigned long last2 = 0;
+const unsigned long User_Selection = 250; // 3     
+unsigned long last3 = 0;  
+
 
 
 /*Testing Parameters*/
@@ -42,9 +49,6 @@ void setup() {
   Serial.begin(9600); //SM
   Serial2.begin(9600); //BLE
   roboclaw.begin(9600); //Start Roboclaward
-#define StatusLED 12
-#define ConnectedLED 11
-
   pinMode(PowerLED, OUTPUT);
   pinMode(StatusLED, OUTPUT);
   pinMode(ConnectedLED, OUTPUT);
@@ -52,7 +56,12 @@ void setup() {
 }
 
 void loop() {
+  unsigned long currentTime = millis(); // run time clock   
   digitalWrite(PowerLED, HIGH);
+  /*Event Timing*/  
+	if (currentTime -  )
+  
+
   bool readEncoder = true;
   String input = bluetooth();
   feedback();
@@ -64,7 +73,7 @@ void loop() {
 
 
 /*Function checks if bluetooth is available then returns value sent by user*/
-String bluetooth() {
+String bluetooth(long ) {
   // Listen for radio
   if (Serial2.available()) {
 
