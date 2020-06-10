@@ -17,6 +17,13 @@ int hall2;
 long EncoderValue; // current encoder value
 int openlimit;
 int closelimit = 0; 
+/*Event timing*/ 
+/*Event timeing interval*/
+const unsigned long Read_BluetoothInput = 250;  // 1
+const unsigned long Read_Encoder = 100; // 2
+const unsigned long User_Selection = 250; // 3    
+
+
 /*Testing Parameters*/
 int closedelay; // delay before starting next
 int opendelay;
@@ -27,6 +34,8 @@ int currentcycle; // cycle counter
 #define StatusLED 12
 #define ConnectedLED 11
 #define ErrorLED     10
+
+
 
 
 void setup() {
