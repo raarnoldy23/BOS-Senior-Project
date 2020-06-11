@@ -4,7 +4,7 @@
 
 #define LED2 7 
 /*Timing Vars*/
-const unsigned long event1 = 1200; // Read Bluetooth 
+const unsigned long event1 =1200 ; // Read Bluetooth 
 unsigned long prev1 = 0; 
 const unsigned long event2 = 1200; // Input Function Call 
 unsigned long prev2 = 0;  
@@ -37,10 +37,9 @@ void loop(){
 	
 }
 
-
+// Changed for serial monitor testing
 String bluetooth() {
   if (Serial2.available()) {
-    //Serial.print("Reading");
     String in = Serial2.readString();
     return in;
   }
@@ -48,12 +47,43 @@ String bluetooth() {
 
 
 void selection(String sel) {
+	int Va1; // Not sure if needed  
+	int Va2; 
+  // Testing push button inputs  	
   if (sel.startsWith("TST1")) {
-    Serial.println("test1");
+    Test1();  
     loop();
   }
   else if (sel.startsWith("TST2")) {
-    Serial.println("test2");
+    Test2(); 
     loop(); 
   }
+  // Test text box input
+  else if (sel.startsWith("Va1")){
+  	Serial.print("Input1: ");
+  	String sel_Va1 = sel.substring(3,sel.length());  // strip prefix 
+  	Va1 = sel_Va1.toInt(); // convert to int     
+  	Serial.print(Va1);  
+  }
+  else if (sel.startsWith("Va2")){
+  	Serial.print("Input2: ");
+  	String sel_Va2 = sel.substring(3,sel.length()); 
+  	Va2 = sel_Va2.toInt();  
+  	Serial.print(Va2);  
+  }
+
+}
+
+
+
+
+
+void Test1(){
+	Serial.print("test1");
+	loop(); 
+}
+void Test2(){
+	Serial.print("test2"); 
+	loop(); 
+
 }

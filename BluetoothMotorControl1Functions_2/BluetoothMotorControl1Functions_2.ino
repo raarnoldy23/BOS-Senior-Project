@@ -21,12 +21,12 @@ int openlimit;
 int closelimit = 0; 
 
 /*Event timing*/ 
-/*Event timeing interval*/
-const unsigned long Read_BluetoothInput = 250;  // 1
+/*Event timeing intervals*/
+const unsigned long Read_BluetoothInput = 1200;  // 1
 unsigned long last1 = 0; 
-const unsigned long Read_Encoder = 100; // 2
+const unsigned long Read_Encoder = 0; // 2 NOT SURE OF TIMING INTERVAL YET!!!
 unsigned long last2 = 0;
-const unsigned long User_Selection = 250; // 3     
+const unsigned long User_Selection = 1200; // 3     
 unsigned long last3 = 0;  
 
 
@@ -58,17 +58,17 @@ void setup() {
 void loop() {
   unsigned long currentTime = millis(); // run time clock   
   digitalWrite(PowerLED, HIGH);
+  String Input; // holds user input 
   /*Event Timing*/  
-	if (currentTime -  )
+  if(currentTime - last1 >= Read_BluetoothInput){ 
+    input = bluetooth();
+    last1 = currentTime; 
+  }
   
-
   bool readEncoder = true;
-  String input = bluetooth();
+  input = bluetooth();
   feedback();
   selection(input);
-
-
-
 }
 
 
