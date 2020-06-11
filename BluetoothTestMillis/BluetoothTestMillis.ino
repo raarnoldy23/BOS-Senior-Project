@@ -60,24 +60,19 @@ void selection(String sel) {
   }
   // Test text box input
   else if (sel.startsWith("Va1")){
-  	Serial.print("Input1: ");
-  	String sel_Va1 = sel.substring(3,sel.length());  // strip prefix 
-  	Va1 = sel_Va1.toInt(); // convert to int     
-  	Serial.print(Va1);  
+  	Input1();  
   }
   else if (sel.startsWith("Va2")){
-  	Serial.print("Input2: ");
-  	String sel_Va2 = sel.substring(3,sel.length()); 
-  	Va2 = sel_Va2.toInt();  
-  	Serial.print(Va2);  
+  	Input2();
   }
+
 
 }
 
 
 
 
-
+// Button input functions  
 void Test1(){
 	Serial.print("test1");
 	loop(); 
@@ -87,3 +82,18 @@ void Test2(){
 	loop(); 
 
 }
+
+
+int Input1(){
+	Serial.print("Input1: ");
+  	String sel_Va1 = sel.substring(3,sel.length());  // strip prefix 
+  	Va1 = sel_Va1.toInt(); // convert to int     
+  	Serial.print(Va1);  
+}
+int Input2(){
+	else if (sel.startsWith("Va2")){
+  	Serial.print("Input2: ");
+  	String sel_Va2 = sel.substring(3,sel.length()); 
+  	Va2 = sel_Va2.toInt();  
+  	Serial.print(Va2);  
+} 

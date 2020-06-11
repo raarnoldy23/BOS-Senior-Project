@@ -4,12 +4,9 @@
 // Bluetooth Motor control
 
 #include "RoboClaw.h"
-
 #define address 0x80 
-
 // create roboclaw object
 RoboClaw roboclaw(&Serial1, 10000);
-
 /*Settings*/
 int ReadEncoderDelay = 250; // Encoder read speed
 int MotorSpeed  = 100 ; // speed of motor
@@ -19,16 +16,14 @@ int hall2;
 long EncoderValue; // current encoder value
 int openlimit;
 int closelimit = 0; 
-
 /*Event timing*/ 
 /*Event timeing intervals*/
 const unsigned long Read_BluetoothInput = 1200;  // 1
-unsigned long last1 = 0; 
-const unsigned long Read_Encoder = 0; // 2 NOT SURE OF TIMING INTERVAL YET!!!
-unsigned long last2 = 0;
+unsigned long lastBluetoothInput = 0; 
+const unsigned long Read_Encoder = 500; // 2 NOT SURE OF TIMING INTERVAL YET!!!
+unsigned long lastEncoder = 0;
 const unsigned long User_Selection = 1200; // 3     
-unsigned long last3 = 0;  
-
+unsigned long lastSelection = 0;  
 
 
 /*Testing Parameters*/
@@ -58,43 +53,47 @@ void setup() {
 void loop() {
   unsigned long currentTime = millis(); // run time clock   
   digitalWrite(PowerLED, HIGH);
-  String Input; // holds user input 
+  String input; // holds user input 
+
   /*Event Timing*/  
-  if(currentTime - last1 >= Read_BluetoothInput){ 
+  if(currentTime - lastBluetoothInput >= Read_BluetoothInput){ 
+    Serial.println("Event1");
     input = bluetooth();
-    last1 = currentTime; 
+    lastBluetoothInput = currentTime; 
+  }
+  if(currentTime - lastSelection >= User_Selection ){
+    Serial.println("Event2"); 
+    selection(input); 
+    lastSelection = currentTime; 
+  } 
+  if(currentTime- lastEncoder >= Read_Encoder){
+    Serial.println("Event3"); 
+    feedback(); 
+    lastSelection = currentTime;  
   }
   
-  bool readEncoder = true;
-  input = bluetooth();
-  feedback();
-  selection(input);
 }
 
 
 /*Function checks if bluetooth is available then returns value sent by user*/
-String bluetooth(long ) {
+String bluetooth() {
   // Listen for radio
   if (Serial2.available()) {
-
     String in = Serial2.readString(); // read value from user
     long  EncoderValue = roboclaw.ReadEncM1(address);
-    //Serial.print("Reading:  ");
-    Serial.println(in); // print value read in
+    //Serial.println(in); // print value read in
     return in;
   }
 }
 
 /*Read feedback from the motors*/
 void feedback() {
-
   EncoderValue = roboclaw.ReadEncM1(address);
   Serial2.print(EncoderValue); // send encoder value to the tablet
   Serial.print(EncoderValue);
   Serial2.println(".");
   Serial2.print("|");
-  delay(ReadEncoderDelay);
-
+  delay(ReadEncoderDelay); // Remove encoder delay
 }
 
 /*Manages input recieved front the user*/
