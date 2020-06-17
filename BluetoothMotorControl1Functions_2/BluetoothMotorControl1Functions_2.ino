@@ -7,8 +7,11 @@
 #define address 0x80 
 // create roboclaw object
 RoboClaw roboclaw(&Serial1, 10000);
-/*Settings*/
-int ReadEncoderDelay = 250; // Encoder read speed
+
+
+/* Test Settings*/
+int ReadEncoderDelay = 250; // Encoder read speed 
+const 
 int MotorSpeed  = 100 ; // speed of motor
 /*Hall Vars */
 int hall1; // hall count returned  by encoders 
@@ -21,8 +24,8 @@ int closelimit = 0;
 unsigned long currentTime = millis(); // run time clock   
 const unsigned long Read_BluetoothInput = 1200;  // 1
 unsigned long lastBluetoothInput = 0; 
-const unsigned long Read_Encoder = 500; // 2 NOT SURE OF TIMING INTERVAL YET!!!
-unsigned long lastEncoder = 0;
+const unsigned long FeedbackInterval = 500; // 2 NOT SURE OF TIMING INTERVAL YET!!!
+unsigned long lastFeedback = 0;
 const unsigned long User_Selection = 1200; // 3     
 unsigned long lastSelection = 0;  
 /*Testing Parameters*/
@@ -37,7 +40,8 @@ int currentcycle; // cycle counter
 /*LED Timing*/
 int lastFlashStatus = 0;
 const unsigned long StatusFlash = 250; 
-
+int lastFlashError = 0; 
+const unsigned long FlashError = 250;  
 
 void setup() {
   Serial.begin(9600); //SM
@@ -85,7 +89,8 @@ String bluetooth() {
 }
 
 /*Return Feedback to UI*/
-void feedback() {
+void feedback(){
+if (currentTime - lastFeedback >= FeedbackInterval){
   EncoderValue1  = roboclaw.ReadEncM1(address);
   EncoderValue2 = roboclaw.ReadEncM2(address);  
 
@@ -93,27 +98,28 @@ void feedback() {
   Serial.print(EncoderValue1 ); 
   Serial2.println(".");
   Serial2.print("|");
-  delay(ReadEncoderDelay); // Remove encoder delay 
+  //delay(ReadEncoderDelay); 
 
   Serial2.print(EncoderValue2);  
   Serial2.println("."); 
   Serial2.print("|");   
-  delay(ReadEncoderDelay);  
+  //delay(ReadEncoderDelay);  
 
   Serial2.print(currentcycle);
   Serial2.println("."); 
   Serial2.print("|");  
-  delay(ReadEncoderDelay);  
+  //delay(ReadEncoderDelay);  
 
   Serial2.print(openlimit); 
   Serial2.println("."); 
   Serial2.print("|");  
-  delay(ReadEncoderDelay);  
+  //delay(ReadEncoderDelay);  
 
   Serial2.print(closelimit); 
   Serial2.println("."); 
   Serial2.print("|");  
-  delay(ReadEncoderDelay);  
+  //delay(ReadEncoderDelay);  
+  }
 }
 
 
@@ -190,10 +196,12 @@ void ResumeTest() {
     else if (EncoderValue1  > openlimit){
       Reverse(); 
     }
+    if (currentcycle == cyclecount)
+    {
+    	ResetTest(); 
+    }
     currentcycle ++; 
-    if (currentcycle ==){} 
   }
-
 }
 
 
@@ -202,6 +210,7 @@ void ResetTest() {
   ReturnHome(); 
   currentcycle = 0; 
   cyclecount = 0; 
+  loop();  
 }
 
 
@@ -261,7 +270,24 @@ void TestRunningLED(){
     }
     digitalRead(StatusLED, StatusLEDState); 
   }
+  lastFlashStatus = currentTime;   
 }
+
+
+void TestError(){
+	if(currentTime - lastFlashError >= StatusFlash){
+		int ErrorLEDState = LOW; 
+		if (ErrorLEDState == LOW){
+			 ErrorLEDState = HIGH; 
+		}
+		else{
+			ErrorLEDState= LOW;      
+		}
+		digitalWrite(ErrorLED, ErrorLEDState);
+	}
+}
+
+
 
   
  
