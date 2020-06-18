@@ -1,4 +1,4 @@
-#include <RoboClaw.h>
+//#include <RoboClaw.h>
 // Ryan Arnoldy
 // Bluetooth Motor control
 /**/ 
@@ -19,7 +19,7 @@ int hall2;
 long EncoderValue1 ; // current encoder value
 long EncoderValue2; 
 int openlimit; 
-int closelimit = 0; 
+int closelimit = 0;  	 	  	 
 /*Event timeing intervals*/
 unsigned long currentTime = millis(); // run time clock   
 const unsigned long Read_BluetoothInput = 1200;  // 1
@@ -28,11 +28,13 @@ const unsigned long FeedbackInterval = 500; // 2 NOT SURE OF TIMING INTERVAL YET
 unsigned long lastFeedback = 0;
 const unsigned long User_Selection = 1200; // 3     
 unsigned long lastSelection = 0;  
-/*Testing Parameters*/
+/*Testing Parameters*/ 	 		
 int closedelay; // delay before starting next
 int opendelay;
 int cyclecount; // # of cycles to be run 
 int currentcycle; // cycle counter
+/*Current Sensor*/
+float currentSensor = A3;  
 /*LEDS*/
 #define StatusLED 13 // shared with programming port on the board 
 #define ConnectedLED 11 // Bluetooth Status 
@@ -81,7 +83,7 @@ void  loop() {
 String bluetooth() {
   // Listen for radio
   if (Serial2.available()) {
-    String in = Serial2.readString(); // read value from user
+    String in = Serial2.readString(); // read valhall effect sensor the same as a quadratureue from user
     long  EncoderValue1  = roboclaw.ReadEncM1(address);
     //Serial.println(in); // print value read in
     return in;
@@ -254,7 +256,15 @@ void Break() {
   roboclaw.BackwardM1(address, 0);
   roboclaw.BackwardM2(address, 0);
 }
-//Mortor2
+//Motor 2 
+void Forward2(){
+  roboclaw.ForwardM2(address, MotorSpeed);
+}
+void Reverse2(){
+  roboclaw.BackwardM2(address, MotorSpeed);
+}
+
+
 
 
 /*LED Functions*/
