@@ -1,0 +1,9 @@
+{
+    "board@Arduino AVR Boards": "Arduino Mega or Mega 2560", 
+    "board@Arduino nRF528x Boards (Mbed OS)": "Arduino Nano 33 BLE", 
+    "option_Processor@Arduino Mega or Mega 2560": "ATmega2560 (Mega 2560)", 
+    "package": "arduino", 
+    "platform": "Arduino AVR Boards", 
+    "programmer": "AVR ISP", 
+    "version": "1.8.2"
+}
